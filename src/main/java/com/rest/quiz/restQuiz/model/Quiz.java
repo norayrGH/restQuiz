@@ -12,14 +12,14 @@ import java.util.List;
 @NoArgsConstructor
 public class Quiz {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
     private String quizName;
     @OneToMany(
             cascade = CascadeType.ALL,
-            orphanRemoval = true
+            mappedBy = "quiz"
     )
-    private List<QuestionQuiz> questionQuizList;
+    private List<QuizQuestion> quizQuestionList;
     private Date startDate;
     private Date endDate;
     private boolean activity;

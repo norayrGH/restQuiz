@@ -4,13 +4,35 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9
                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
-    <changeSet author="liquibase-docs" id="addColumn-example">
-        <addAutoIncrement tableName="quiz" columnName="id"/>
+    <changeSet author="liquibase-docs" id="addColumns_quiz">
+
         <insert schemaName="public" tableName="quiz">
             <column name="activity" valueBoolean="false"/>
             <column name="quiz_name" value="Кто будет первым в списке форбс."/>
             <column name="end_date" valueDate="2019-10-27 14:53:39.309000"/>
             <column name="start_date" valueDate="2019-10-26 00:00:00.000000"/>
         </insert>
+
+    </changeSet>
+    <changeSet author="liquibase-docs" id="addColumn_quiz_question">
+
+        <insert schemaName="public" tableName="quiz_question">
+            <column name="display_order" valueNumeric="1"/>
+            <column name="question" value="Рокфейлер"/>
+            <column name="quiz_id" valueNumeric="1"/>
+        </insert>
+
+        <insert schemaName="public" tableName="quiz_question">
+            <column name="display_order" valueNumeric="2"/>
+            <column name="question" value="Родшельд"/>
+            <column name="quiz_id" valueNumeric="1"/>
+        </insert>
+
+        <insert schemaName="public" tableName="quiz_question">
+            <column name="display_order" valueNumeric="3"/>
+            <column name="question" value="Ти штольи ?"/>
+            <column name="quiz_id" valueNumeric="1"/>
+        </insert>
+
     </changeSet>
 </databaseChangeLog>

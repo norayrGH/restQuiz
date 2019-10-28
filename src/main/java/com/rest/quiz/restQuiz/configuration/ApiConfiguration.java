@@ -1,6 +1,7 @@
 package com.rest.quiz.restQuiz.configuration;
 
 import liquibase.integration.spring.SpringLiquibase;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
@@ -20,7 +21,7 @@ import java.util.Collections;
 
 @Configuration
 @EnableSwagger2
-public class SwaggerConfig {
+public class ApiConfiguration {
     @Autowired
     private DataSourceProperties dataSourceProperties;
     @Bean
@@ -59,5 +60,10 @@ public class SwaggerConfig {
         liquibase.setChangeLog("classpath:db/changelog/db.changelog-master.xml");
         liquibase.setDataSource(dataSource());
         return liquibase;
+    }
+
+    @Bean
+    public ModelMapper modelMapper() {
+        return new ModelMapper();
     }
 }

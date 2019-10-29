@@ -1,7 +1,9 @@
 package com.rest.quiz.restQuiz.service;
 
+import com.rest.quiz.restQuiz.dto.QuizDTO;
 import com.rest.quiz.restQuiz.model.Quiz;
 import com.rest.quiz.restQuiz.repository.QuizRepository;
+import com.rest.quiz.restQuiz.service.mapper.MapModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +22,8 @@ public class QuizService {
         return (Quiz) quizOptional.get();
     }
 
-    public void saveQuiz(Quiz quiz){
+    public void saveQuiz(QuizDTO quizDTO){
+        Quiz quiz = MapModel.convertToEntity(quizDTO);
         quizRepository.save(quiz);
     }
 }

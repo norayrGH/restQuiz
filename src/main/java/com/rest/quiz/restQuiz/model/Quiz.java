@@ -1,14 +1,17 @@
 package com.rest.quiz.restQuiz.model;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-
 import javax.persistence.*;
 import java.util.Date;
-import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-@Entity
 @Data
+@EqualsAndHashCode(exclude = "quizQuestionList")
+@Entity
 @NoArgsConstructor
 public class Quiz {
     @Id
@@ -19,7 +22,7 @@ public class Quiz {
             cascade = CascadeType.ALL,
             mappedBy = "quiz"
     )
-    private List<QuizQuestion> quizQuestionList;
+    private Set<QuizQuestion> quizQuestionList;
     private Date startDate;
     private Date endDate;
     private boolean activity;

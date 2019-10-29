@@ -1,7 +1,8 @@
 package com.rest.quiz.restQuiz.configuration;
 
 import liquibase.integration.spring.SpringLiquibase;
-import org.modelmapper.ModelMapper;
+import org.dozer.DozerBeanMapper;
+import org.dozer.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
@@ -63,7 +64,10 @@ public class ApiConfiguration {
     }
 
     @Bean
-    public ModelMapper modelMapper() {
-        return new ModelMapper();
+    public Mapper dozerMapper(){
+
+        return new DozerBeanMapper();
     }
+
+
 }

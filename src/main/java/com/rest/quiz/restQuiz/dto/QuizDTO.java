@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 
 @Getter
@@ -22,5 +23,18 @@ public class QuizDTO {
     private Date startDate;
     private Date endDate;
     private boolean activity;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        QuizDTO quizDTO = (QuizDTO) o;
+        return getId() == quizDTO.getId();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId());
+    }
 
 }

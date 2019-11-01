@@ -18,7 +18,10 @@ import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import javax.sql.DataSource;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 @Configuration
 @EnableSwagger2
@@ -64,10 +67,7 @@ public class ApiConfiguration {
     }
 
     @Bean
-    public Mapper dozerMapper(){
-
-        return new DozerBeanMapper();
+    public Mapper dozerBeanMapper(){
+        return new DozerBeanMapper(Arrays.asList("classpath:dozer_mapping.xml"));
     }
-
-
 }

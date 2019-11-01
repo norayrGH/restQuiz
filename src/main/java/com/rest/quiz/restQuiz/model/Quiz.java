@@ -5,6 +5,8 @@ import com.rest.quiz.restQuiz.service.mapper.MapModel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.dozer.Mapping;
+
 import javax.persistence.*;
 import java.util.Date;
 import java.util.Set;
@@ -24,6 +26,8 @@ public class Quiz {
             cascade = CascadeType.ALL,
             mappedBy = "quiz"
     )
+    @Mapping("quizQuestionList")
+
     private Set<QuizQuestion> quizQuestionList;
     private Date startDate;
     private Date endDate;

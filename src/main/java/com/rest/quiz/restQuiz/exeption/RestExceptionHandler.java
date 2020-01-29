@@ -2,7 +2,6 @@ package com.rest.quiz.restQuiz.exeption;
 
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -21,4 +20,5 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleQuizNotFoundException(RuntimeException ex, WebRequest request) {
         return buildResponseEntity( new ApiError(HttpStatus.NOT_FOUND, ex.getMessage(),request));
     }
+
 }

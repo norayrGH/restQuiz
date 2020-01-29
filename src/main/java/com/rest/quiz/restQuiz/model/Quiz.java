@@ -1,47 +1,42 @@
 package com.rest.quiz.restQuiz.model;
 
-import com.rest.quiz.restQuiz.dto.QuizDTO;
-import com.rest.quiz.restQuiz.service.mapper.MapModel;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import org.dozer.Mapping;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.List;
+import java.util.Objects;
 
-@Data
-@EqualsAndHashCode(exclude = "quizQuestionList")
+@Getter
+@Setter
 @Entity
+@AllArgsConstructor
 @NoArgsConstructor
 public class Quiz {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
     private String quizName;
     @OneToMany(
             cascade = CascadeType.ALL,
-            mappedBy = "quiz"
+            mappedBy = "quiz",
+            fetch = FetchType.LAZY
     )
-    @Mapping("quizQuestionList")
-
-    private Set<QuizQuestion> quizQuestionList;
+    private List<QuizQuestion> quizQuestionList;
     private Date startDate;
     private Date endDate;
     private boolean activity;
 
-    public void addUpdatableFeilds(QuizDTO quizDTO){
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Quiz quiz = (Quiz) o;
+        return getId() == quiz.getId();
+    }
 
-        if (!quizDTO.getQuizName().isEmpty())
-            this.quizName = quizDTO.getQuizName();
-        if (quizDTO.getStartDate()!=null)
-            this.startDate = quizDTO.getStartDate();
-        if (quizDTO.getEndDate()!=null)
-            this.endDate = quizDTO.getEndDate();
-
-
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId());
     }
 }

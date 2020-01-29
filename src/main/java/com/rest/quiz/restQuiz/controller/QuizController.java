@@ -1,4 +1,4 @@
-package com.rest.quiz.restQuiz.controller.impl;
+package com.rest.quiz.restQuiz.controller;
 
 import com.rest.quiz.restQuiz.dto.QuizDTO;
 import org.springframework.http.ResponseEntity;

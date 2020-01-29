@@ -18,32 +18,34 @@ import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import javax.sql.DataSource;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
+
+import static org.dozer.loader.api.FieldsMappingOptions.customConverter;
 
 @Configuration
 @EnableSwagger2
 public class ApiConfiguration {
     @Autowired
     private DataSourceProperties dataSourceProperties;
+
     @Bean
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
-          .select()
-          .apis(RequestHandlerSelectors.basePackage("com.rest.quiz.restQuiz.controller"))
-          .paths(PathSelectors.any())
-          .build()
+                .select()
+                .apis(RequestHandlerSelectors.basePackage("com.rest.quiz.restQuiz.controller"))
+                .paths(PathSelectors.any())
+                .build()
                 .apiInfo(apiInfo());
     }
+
     private ApiInfo apiInfo() {
         return new ApiInfo(
                 "My REST API",
                 "Some custom description of API.",
                 "API TOS",
                 "Terms of service",
-                new Contact("Norayr Gharibyan", "restquize", "norayr.gharibyan.java@gmail.com"),
+                    new Contact("Norayr Gharibyan", "restquize", "norayr.gharibyan.java@gmail.com"),
                 "License of API", "API license URL", Collections.emptyList());
     }
 
@@ -61,13 +63,13 @@ public class ApiConfiguration {
     @Bean
     public SpringLiquibase liquibase() {
         SpringLiquibase liquibase = new SpringLiquibase();
-        liquibase.setChangeLog("classpath:db/changelog/db.changelog-master.xml");
+            liquibase.setChangeLog("classpath:db/changelog/db.changelog-master.xml");
         liquibase.setDataSource(dataSource());
         return liquibase;
     }
 
     @Bean
-    public Mapper dozerBeanMapper(){
+    public Mapper dozerBeanMapper() {
         return new DozerBeanMapper(Arrays.asList("classpath:dozer_mapping.xml"));
     }
 }

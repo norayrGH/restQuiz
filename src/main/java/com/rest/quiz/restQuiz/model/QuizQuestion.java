@@ -1,31 +1,44 @@
 package com.rest.quiz.restQuiz.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
+import java.util.Objects;
+
 @Data
 @Entity
 @NoArgsConstructor
+@AllArgsConstructor
+@Table(
+        uniqueConstraints =  @UniqueConstraint(
+                columnNames = {
+                        "displayOrder",
+                        "quiz_id"
+                }
+        )
+)
+@Getter
+@Setter
 public class QuizQuestion {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
-    @ManyToOne
+    private Long id;
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn
     private Quiz quiz;
     private String question;
-    private int displayOrder;
+    private Integer displayOrder;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        QuizQuestion that = (QuizQuestion) o;
+        return getId() == that.getId();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId());
+    }
 }

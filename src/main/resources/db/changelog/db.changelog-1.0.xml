@@ -30,7 +30,7 @@
 
         <insert schemaName="public" tableName="quiz_question">
             <column name="display_order" valueNumeric="3"/>
-            <column name="question" value="Ти штольи ?"/>
+            <column name="question" value="Ты штольи ?"/>
             <column name="quiz_id" valueNumeric="1"/>
         </insert>
 

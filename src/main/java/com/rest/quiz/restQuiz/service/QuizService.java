@@ -32,6 +32,7 @@ public class QuizService {
     }
 
     public QuizDTO getQuizById(Long quizId) {
+        String s = "s";
         Quiz quiz = quizRepository.findById(quizId).orElseThrow(() -> new QuizNotFoundException("Quiz not Found with " + quizId + " id."));
         return mapModel.convertToDto(quiz);
     }

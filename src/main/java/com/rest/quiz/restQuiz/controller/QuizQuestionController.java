@@ -1,8 +1,6 @@
 package com.rest.quiz.restQuiz.controller;
 
-import com.rest.quiz.restQuiz.dto.QuizDTO;
 import com.rest.quiz.restQuiz.dto.QuizQuestionDTO;
-import com.rest.quiz.restQuiz.model.QuizQuestion;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,4 +20,5 @@ public interface QuizQuestionController {
 
     @GetMapping(value = "")
     ResponseEntity getAll();
+
 }

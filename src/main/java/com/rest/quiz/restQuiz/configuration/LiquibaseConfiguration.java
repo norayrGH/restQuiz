@@ -9,11 +9,11 @@ import org.springframework.context.annotation.Profile;
 import javax.sql.DataSource;
 
 @Configuration
-public class H2TestProfileJPAConfig {
+public class LiquibaseConfiguration {
     final DataSource dataSource;
 
     @Autowired
-    public H2TestProfileJPAConfig(DataSource dataSource) {
+    public LiquibaseConfiguration(DataSource dataSource) {
         this.dataSource = dataSource;
     }
 

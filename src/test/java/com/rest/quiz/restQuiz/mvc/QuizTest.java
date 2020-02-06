@@ -1,7 +1,7 @@
 package com.rest.quiz.restQuiz.mvc;
 
 import com.rest.quiz.restQuiz.RestQuizApplication;
-import com.rest.quiz.restQuiz.configuration.H2TestProfileJPAConfig;
+import com.rest.quiz.restQuiz.configuration.LiquibaseConfiguration;
 import com.rest.quiz.restQuiz.dto.QuizDTO;
 import com.rest.quiz.restQuiz.model.Quiz;
 import com.rest.quiz.restQuiz.service.QuizService;
@@ -21,10 +21,10 @@ import java.util.Date;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {RestQuizApplication.class,
-        H2TestProfileJPAConfig.class})
+        LiquibaseConfiguration.class})
 @ActiveProfiles("test")
 @PropertySource("classpath:api.calls.properties")
-public class PolicyControllerTest {
+public class QuizTest {
 
     @Autowired
     private QuizService quizService;
@@ -48,12 +48,6 @@ public class PolicyControllerTest {
     @Test
     public void savedQuiz() {
         QuizDTO quiz = quizService.getQuizById(1L);
-        //quiz.setId(null);
-        //Quiz savedQuiz = quizRepository.save(quiz);
-        //assertThat(savedUser.getRegistrationDate()).isNotNull();
     }
 
-    public Quiz createQuiz(){
-        return new Quiz(1L,"test",null,new Date(),new Date(),true);
-    }
 }

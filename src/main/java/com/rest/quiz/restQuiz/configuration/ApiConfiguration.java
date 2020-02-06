@@ -1,6 +1,5 @@
 package com.rest.quiz.restQuiz.configuration;
 
-import liquibase.integration.spring.SpringLiquibase;
 import org.dozer.DozerBeanMapper;
 import org.dozer.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,17 +16,18 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
-import javax.sql.DataSource;
 import java.util.Arrays;
 import java.util.Collections;
-
-import static org.dozer.loader.api.FieldsMappingOptions.customConverter;
 
 @Configuration
 @EnableSwagger2
 public class ApiConfiguration {
+    private final DataSourceProperties dataSourceProperties;
+
     @Autowired
-    private DataSourceProperties dataSourceProperties;
+    public ApiConfiguration(DataSourceProperties dataSourceProperties) {
+        this.dataSourceProperties = dataSourceProperties;
+    }
 
     @Bean
     public Docket api() {
@@ -47,25 +47,6 @@ public class ApiConfiguration {
                 "Terms of service",
                     new Contact("Norayr Gharibyan", "restquize", "norayr.gharibyan.java@gmail.com"),
                 "License of API", "API license URL", Collections.emptyList());
-    }
-
-    @Bean
-    @Primary
-    public DataSource dataSource() {
-        return DataSourceBuilder
-                .create()
-                .username(dataSourceProperties.getUsername())
-                .password(dataSourceProperties.getPassword())
-                .url(dataSourceProperties.getUrl())
-                .build();
-    }
-
-    @Bean
-    public SpringLiquibase liquibase() {
-        SpringLiquibase liquibase = new SpringLiquibase();
-            liquibase.setChangeLog("classpath:db/changelog/db.changelog-master.xml");
-        liquibase.setDataSource(dataSource());
-        return liquibase;
     }
 
     @Bean

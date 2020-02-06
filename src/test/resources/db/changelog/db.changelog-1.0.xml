@@ -4,13 +4,13 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9
                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
-    <changeSet author="liquibase-docs" id="create_table_QUIZ">
+    <changeSet author="liquibase-docs" id="create_table_quiz_test">
         <preConditions onFail="MARK_RAN">
             <not>
-                <tableExists tableName="QUIZ"/>
+                <tableExists  tableName="quiz"/>
             </not>
         </preConditions>
-        <createTable schemaName="public" tableName="QUIZ">
+        <createTable  tableName="quiz">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
@@ -29,9 +29,9 @@
 
         </createTable>
     </changeSet>
-    <changeSet author="liquibase-docs" id="addColumns_quiz">
+    <changeSet author="liquibase-docs" id="addColumns_quiz_test">
 
-        <insert schemaName="public" tableName="QUIZ">
+        <insert  tableName="quiz">
             <column name="activity" valueBoolean="false"/>
             <column name="quiz_name" value="Кто будет первым в списке форбс."/>
             <column name="end_date" valueDate="2019-10-27 14:53:39.309000"/>
@@ -39,13 +39,13 @@
         </insert>
 
     </changeSet>
-    <changeSet author="liquibase-docs" id="create_table_quiz_question">
+    <changeSet author="liquibase-docs" id="create_table_quiz_question_test">
         <preConditions onFail="MARK_RAN">
             <not>
-                <tableExists tableName="QUIZ_QUESTION"/>
+                <tableExists  tableName="quiz_question"/>
             </not>
         </preConditions>
-        <createTable schemaName="public" tableName="QUIZ_QUESTION">
+        <createTable  tableName="quiz_question">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
@@ -60,28 +60,28 @@
             </column>
         </createTable>
         <addForeignKeyConstraint baseColumnNames="quiz_id"
-                                 baseTableName="QUIZ_QUESTION"
+                                 baseTableName="quiz_question"
                                  constraintName="quiz_id"
                                  onDelete="CASCADE"
                                  onUpdate="RESTRICT"
                                  referencedColumnNames="id"
-                                 referencedTableName="QUIZ"/>
+                                 referencedTableName="quiz"/>
     </changeSet>
-    <changeSet author="liquibase-docs" id="addColumn_quiz_question">
+    <changeSet author="liquibase-docs" id="addColumn_quiz_question_test">
 
-        <insert schemaName="public" tableName="QUIZ_QUESTION">
+        <insert   tableName="quiz_question">
             <column name="display_order" valueNumeric="1"/>
             <column name="question" value="Рокфейлер"/>
             <column name="quiz_id" valueNumeric="1"/>
         </insert>
 
-        <insert schemaName="public" tableName="QUIZ_QUESTION">
+        <insert  tableName="quiz_question">
             <column name="display_order" valueNumeric="2"/>
             <column name="question" value="Родшельд"/>
             <column name="quiz_id" valueNumeric="1"/>
         </insert>
 
-        <insert schemaName="public" tableName="QUIZ_QUESTION">
+        <insert  tableName="quiz_question">
             <column name="display_order" valueNumeric="3"/>
             <column name="question" value="Ты штольи ?"/>
             <column name="quiz_id" valueNumeric="1"/>

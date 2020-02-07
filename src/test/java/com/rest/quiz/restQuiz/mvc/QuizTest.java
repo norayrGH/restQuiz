@@ -1,6 +1,5 @@
 package com.rest.quiz.restQuiz.mvc;
 
-import com.rest.quiz.restQuiz.RestQuizApplication;
 import com.rest.quiz.restQuiz.dto.QuizDTO;
 import com.rest.quiz.restQuiz.service.QuizService;
 import org.junit.AfterClass;

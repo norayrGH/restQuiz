@@ -8,6 +8,7 @@ import com.rest.quiz.restQuiz.model.QuizQuestion;
 import com.rest.quiz.restQuiz.repository.QuizQuestionRepository;
 import com.rest.quiz.restQuiz.repository.QuizRepository;
 import com.rest.quiz.restQuiz.service.mapper.MapModel;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.dozer.DozerBeanMapper;
 import org.dozer.Mapper;
@@ -20,19 +21,14 @@ import java.util.Optional;
 import java.util.Set;
 
 @Service
+@AllArgsConstructor
 public class QuizService {
 
     private final QuizRepository quizRepository;
     private final QuizQuestionRepository quizQuestionRepository;
     private final MapModel mapModel;
     private final DozerBeanMapper dozerBeanMapper;
-    @Autowired
-    public QuizService(QuizRepository quizRepository, QuizQuestionRepository quizQuestionRepository, MapModel mapModel, DozerBeanMapper dozerBeanMapper) {
-        this.quizRepository = quizRepository;
-        this.quizQuestionRepository = quizQuestionRepository;
-        this.mapModel = mapModel;
-        this.dozerBeanMapper = dozerBeanMapper;
-    }
+
     @Transactional
     public QuizDTO getQuizById(Long quizId) {
         Quiz quiz = quizRepository.findById(quizId).orElseThrow(() -> new QuizNotFoundException("Quiz not Found with " + quizId + " id."));

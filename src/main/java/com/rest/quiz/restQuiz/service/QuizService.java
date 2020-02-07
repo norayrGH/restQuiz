@@ -10,22 +10,31 @@ import com.rest.quiz.restQuiz.repository.QuizRepository;
 import com.rest.quiz.restQuiz.service.mapper.MapModel;
 import lombok.RequiredArgsConstructor;
 import org.dozer.DozerBeanMapper;
+import org.dozer.Mapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
-@RequiredArgsConstructor
 public class QuizService {
 
     private final QuizRepository quizRepository;
     private final QuizQuestionRepository quizQuestionRepository;
     private final MapModel mapModel;
     private final DozerBeanMapper dozerBeanMapper;
-
+    @Autowired
+    public QuizService(QuizRepository quizRepository, QuizQuestionRepository quizQuestionRepository, MapModel mapModel, DozerBeanMapper dozerBeanMapper) {
+        this.quizRepository = quizRepository;
+        this.quizQuestionRepository = quizQuestionRepository;
+        this.mapModel = mapModel;
+        this.dozerBeanMapper = dozerBeanMapper;
+    }
+    @Transactional
     public QuizDTO getQuizById(Long quizId) {
-        String s = "s";
         Quiz quiz = quizRepository.findById(quizId).orElseThrow(() -> new QuizNotFoundException("Quiz not Found with " + quizId + " id."));
         return mapModel.convertToDto(quiz);
     }

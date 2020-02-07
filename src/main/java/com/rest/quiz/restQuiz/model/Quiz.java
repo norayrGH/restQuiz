@@ -20,7 +20,7 @@ public class Quiz {
     @OneToMany(
             cascade = CascadeType.ALL,
             mappedBy = "quiz",
-            fetch = FetchType.EAGER
+            fetch = FetchType.LAZY
     )
     private List<QuizQuestion> quizQuestionList;
     private Date startDate;

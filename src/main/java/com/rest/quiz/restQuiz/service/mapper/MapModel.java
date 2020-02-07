@@ -16,7 +16,6 @@ public class MapModel {
 
     private final DozerBeanMapper dozerBeanMapper;
 
-    @Autowired
     public MapModel(DozerBeanMapper dozerBeanMapper) {
         this.dozerBeanMapper = dozerBeanMapper;
     }

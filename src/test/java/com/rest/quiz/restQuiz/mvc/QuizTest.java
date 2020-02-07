@@ -1,9 +1,7 @@
 package com.rest.quiz.restQuiz.mvc;
 
 import com.rest.quiz.restQuiz.RestQuizApplication;
-import com.rest.quiz.restQuiz.configuration.LiquibaseConfiguration;
 import com.rest.quiz.restQuiz.dto.QuizDTO;
-import com.rest.quiz.restQuiz.model.Quiz;
 import com.rest.quiz.restQuiz.service.QuizService;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -14,15 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.Date;
-
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {RestQuizApplication.class,
-        LiquibaseConfiguration.class})
-@ActiveProfiles("test")
+@SpringBootTest
 @PropertySource("classpath:api.calls.properties")
 public class QuizTest {
 

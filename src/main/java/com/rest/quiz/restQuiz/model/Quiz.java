@@ -3,6 +3,7 @@ package com.rest.quiz.restQuiz.model;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -22,7 +23,7 @@ public class Quiz {
             mappedBy = "quiz",
             fetch = FetchType.LAZY
     )
-    private List<QuizQuestion> quizQuestionList;
+    private List<QuizQuestion> quizQuestionList = new ArrayList<>();
     private Date startDate;
     private Date endDate;
     private boolean activity;

@@ -9,15 +9,11 @@ import com.rest.quiz.restQuiz.repository.QuizQuestionRepository;
 import com.rest.quiz.restQuiz.repository.QuizRepository;
 import com.rest.quiz.restQuiz.service.mapper.MapModel;
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.dozer.DozerBeanMapper;
-import org.dozer.Mapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -34,16 +30,22 @@ public class QuizService {
         Quiz quiz = quizRepository.findById(quizId).orElseThrow(() -> new QuizNotFoundException("Quiz not Found with " + quizId + " id."));
         return mapModel.convertToDto(quiz);
     }
+
+    @Transactional
     public QuizQuestionDTO getQuizQuestionById(Long quizQuestionId){
         QuizQuestion quizQuestion = quizQuestionRepository.findById(quizQuestionId).orElseThrow(() -> new QuizNotFoundException("QuizQuestion not Found with " + quizQuestionId + " id."));
         return mapModel.convertToDto(quizQuestion);
     }
+
+    @Transactional
     public List<Quiz> getAllQuizes() {
         List<Quiz> quizzes = (List<Quiz>) quizRepository.findAll();
         if (quizzes.isEmpty())
             throw new QuizNotFoundException("Any quiz not found.");
         return quizzes;
     }
+
+    @Transactional
     public Set<QuizQuestion> getAllQuizeQuestions() {
         Set<QuizQuestion> quizzes = (Set<QuizQuestion>) quizQuestionRepository.findAll();
         if (quizzes.isEmpty())
@@ -51,17 +53,19 @@ public class QuizService {
         return quizzes;
     }
 
-    public void saveQuiz(QuizDTO quizDTO) {
+    public Quiz saveQuiz(QuizDTO quizDTO) {
         Quiz quiz = mapModel.convertToEntity(quizDTO);
-        quizRepository.save(quiz);
+        return quizRepository.save(quiz);
     }
 
+    @Transactional
     public void saveQuizQuestion(Long quizId, QuizQuestionDTO quizQuestionDTO) {
         QuizQuestion quizQuestion = mapModel.convertToEntity(quizQuestionDTO);
         quizQuestion.getQuiz().setId(quizId);
         quizQuestionRepository.save(quizQuestion);
     }
 
+    @Transactional
     public QuizDTO updateQuiz(QuizDTO quizDTO, long quizId) {
         quizDTO.setId(quizId);
         Quiz quizUpdate = quizRepository.findById(quizId).orElseThrow(() -> new QuizNotFoundException(

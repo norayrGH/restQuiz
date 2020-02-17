@@ -43,8 +43,7 @@ public class QuizControllerImpl implements QuizController {
     @Override
     @PostMapping(value = "")
     public ResponseEntity create(@RequestBody QuizDTO quizDTO) {
-         quizService.saveQuiz(quizDTO);
-        return ResponseEntity.ok().body("Quiz which id: " + quizDTO.getId() + " hes been saved.");
+        return ResponseEntity.ok().body(quizService.saveQuiz(quizDTO));
     }
 
     @Override

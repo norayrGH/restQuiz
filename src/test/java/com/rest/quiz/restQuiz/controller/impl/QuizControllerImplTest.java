@@ -3,6 +3,8 @@ package com.rest.quiz.restQuiz.controller.impl;
 import com.rest.quiz.restQuiz.dto.QuizDTO;
 import com.rest.quiz.restQuiz.dto.QuizQuestionDTO;
 import com.rest.quiz.restQuiz.model.Quiz;
+import com.rest.quiz.restQuiz.model.QuizQuestion;
+import com.rest.quiz.restQuiz.repository.QuizRepository;
 import com.rest.quiz.restQuiz.service.QuizService;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -18,6 +20,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 import static com.google.common.net.HttpHeaders.ACCEPT;
@@ -78,16 +83,30 @@ class QuizControllerImplTest {
     }
 
     @Test
-    void deleteByIdShouldSuccess() {
+    void  deleteByIdShouldSuccess() {
+        QuizDTO quizDTO = getQuizDTO();
+        webTestClient
+                .post()
+                .uri(Objects.requireNonNull(environment.getProperty("createQuiz")))
+                .contentType(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .body(Mono.just(quizDTO), QuizDTO.class)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody().jsonPath("$.id").isEqualTo(2);
+
+        webTestClient
+                .delete()
+                .uri(String.format(Objects.requireNonNull(environment.getProperty("deleteQuiz")), 2))
+                .accept(APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk();
+
     }
 
     @Test
     void createShouldSuccess() {
         QuizDTO quizDTO = getQuizDTO();
-        quizDTO.setId(null);
-        for(QuizQuestionDTO quizQuestionDto:quizDTO.getQuizQuestionList()){
-            quizQuestionDto.setId(null);
-        }
 
         System.out.println(webTestClient.post().uri(Objects.requireNonNull(environment.getProperty("createQuiz")))
                 .contentType(APPLICATION_JSON)
@@ -95,16 +114,57 @@ class QuizControllerImplTest {
                 .body(Mono.just(quizDTO), QuizDTO.class)
                 .exchange()
                 .expectStatus().isOk()
-                .expectHeader().contentType(MediaType.APPLICATION_JSON_UTF8)
-                .expectBody().returnResult());
+                .expectBody().jsonPath("$.id").isEqualTo(2).returnResult()
+        );
+        webTestClient
+                .delete()
+                .uri(String.format(Objects.requireNonNull(environment.getProperty("deleteQuiz")), 2))
+                .accept(APPLICATION_JSON)
+                .exchange();
 
     }
 
     @Test
     void getAllShouldSuccess() {
+        webTestClient
+                .get()
+                .uri(Objects.requireNonNull(environment.getProperty("getAllQuizes")))
+                .accept(MediaType.APPLICATION_JSON_UTF8)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(QuizDTO.class).hasSize(1);
     }
 
-    public QuizDTO getQuizDTO(){
-        return quizService.getQuizById(1L);
+    private QuizDTO getQuizDTO() {
+        QuizDTO quizDTO = quizService.getQuizById(1L);
+        quizDTO.setId(null);
+        for(QuizQuestionDTO quizQuestionDto:quizDTO.getQuizQuestionList()){
+            quizQuestionDto.setId(null);
+        }
+        return quizDTO;
+
     }
+
+    /*private QuizDTO createQuiz() {
+        QuizDTO quiz = new QuizDTO();
+        quiz.setActivity(true);
+        quiz.setEndDate(new Date());
+        quiz.setQuizName("Some Question");
+        quiz.setStartDate(new Date());
+        quiz.setQuizQuestionList(createQuizQuestion(3));
+        return quiz;
+    }
+
+    private List<QuizQuestionDTO> createQuizQuestion(int countOfQuestion) {
+        List<QuizQuestionDTO> quizQuestions = new ArrayList<>();
+        for (int i = 0; i < countOfQuestion; i++) {
+            QuizQuestionDTO quizQuestion = new QuizQuestionDTO();
+            quizQuestion.setQuestion("question Number: "+i);
+            quizQuestion.setDisplayOrder(i);
+            quizQuestions.add(quizQuestion);
+
+        }
+        return quizQuestions;
+    }
+*/
 }

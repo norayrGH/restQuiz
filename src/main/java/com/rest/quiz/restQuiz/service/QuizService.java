@@ -38,8 +38,9 @@ public class QuizService {
     }
 
     @Transactional
-    public List<Quiz> getAllQuizes() {
+    public List<QuizDTO> getAllQuizes() {
         List<Quiz> quizzes = (List<Quiz>) quizRepository.findAll();
+        mapModel.convertToDto(quizzes,List<QuizDTO.class>);
         if (quizzes.isEmpty())
             throw new QuizNotFoundException("Any quiz not found.");
         return quizzes;
@@ -53,9 +54,9 @@ public class QuizService {
         return quizzes;
     }
 
-    public Quiz saveQuiz(QuizDTO quizDTO) {
+    public QuizDTO saveQuiz(QuizDTO quizDTO) {
         Quiz quiz = mapModel.convertToEntity(quizDTO);
-        return quizRepository.save(quiz);
+        return mapModel.convertToDto(quizRepository.save(quiz));
     }
 
     @Transactional

@@ -1,6 +1,9 @@
 package com.rest.quiz.restQuiz.model;
 
 import lombok.*;
+import org.hibernate.annotations.ResultCheckStyle;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -13,6 +16,8 @@ import java.util.Objects;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
+@SQLDelete(sql = "UPDATE TESTSCHEMA.quiz SET quiz_state = 'DELETED' WHERE id = ?", check = ResultCheckStyle.COUNT)
+@Where(clause = "quiz_state <> 'DELETED'")
 public class Quiz {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,7 +31,8 @@ public class Quiz {
     private List<QuizQuestion> quizQuestionList = new ArrayList<>();
     private Date startDate;
     private Date endDate;
-    private boolean activity;
+    @Enumerated(EnumType.STRING)
+    private QuizState quizState = QuizState.ACTIVE;
 
     @Override
     public boolean equals(Object o) {
@@ -39,5 +45,10 @@ public class Quiz {
     @Override
     public int hashCode() {
         return Objects.hash(getId());
+    }
+
+    @PreRemove
+    public void deleteUser() {
+        this.quizState = QuizState.DELETED;
     }
 }

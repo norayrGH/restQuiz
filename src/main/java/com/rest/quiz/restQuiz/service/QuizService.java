@@ -12,9 +12,15 @@ import lombok.AllArgsConstructor;
 import org.dozer.DozerBeanMapper;
 import org.springframework.stereotype.Service;
 
+import javax.sql.DataSource;
 import javax.transaction.Transactional;
+import java.math.BigInteger;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -24,7 +30,6 @@ public class QuizService {
     private final QuizQuestionRepository quizQuestionRepository;
     private final MapModel mapModel;
     private final DozerBeanMapper dozerBeanMapper;
-
     @Transactional
     public QuizDTO getQuizById(Long quizId) {
         Quiz quiz = quizRepository.findById(quizId).orElseThrow(() -> new QuizNotFoundException("Quiz not Found with " + quizId + " id."));
@@ -40,10 +45,11 @@ public class QuizService {
     @Transactional
     public List<QuizDTO> getAllQuizes() {
         List<Quiz> quizzes = (List<Quiz>) quizRepository.findAll();
-        mapModel.convertToDto(quizzes,List<QuizDTO.class>);
         if (quizzes.isEmpty())
             throw new QuizNotFoundException("Any quiz not found.");
-        return quizzes;
+        return quizzes.stream()
+                .map(mapModel::convertToDto)
+                .collect(Collectors.toList());
     }
 
     @Transactional
@@ -79,6 +85,10 @@ public class QuizService {
 
     public void deleteQuiz(long quizId) {
         quizRepository.deleteById(quizId);
+    }
+
+    public Long findLastId(){
+        return quizRepository.findTopByOrderByIdDesc().getId();
     }
 
 }

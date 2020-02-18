@@ -60,7 +60,6 @@ class QuizControllerImplTest {
                 .expectBody()
                 .jsonPath("$.length()").isEqualTo(6)
                 .jsonPath("$.id").isEqualTo(1)
-                .jsonPath("$.quizName").isEqualTo("Кто будет первым в списке форбс.")
                 .jsonPath("$.quizQuestionList[0]").isNotEmpty().returnResult());
     }
 
@@ -84,20 +83,11 @@ class QuizControllerImplTest {
 
     @Test
     void  deleteByIdShouldSuccess() {
-        QuizDTO quizDTO = getQuizDTO();
-        webTestClient
-                .post()
-                .uri(Objects.requireNonNull(environment.getProperty("createQuiz")))
-                .contentType(APPLICATION_JSON)
-                .accept(APPLICATION_JSON)
-                .body(Mono.just(quizDTO), QuizDTO.class)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody().jsonPath("$.id").isEqualTo(2);
+        //Long lastId = quizService.findLastId();
 
         webTestClient
                 .delete()
-                .uri(String.format(Objects.requireNonNull(environment.getProperty("deleteQuiz")), 2))
+                .uri(String.format(Objects.requireNonNull(environment.getProperty("deleteQuiz")), 1))
                 .accept(APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk();
@@ -107,32 +97,34 @@ class QuizControllerImplTest {
     @Test
     void createShouldSuccess() {
         QuizDTO quizDTO = getQuizDTO();
-
+        Long lastId = quizService.findLastId();
         System.out.println(webTestClient.post().uri(Objects.requireNonNull(environment.getProperty("createQuiz")))
                 .contentType(APPLICATION_JSON)
                 .accept(APPLICATION_JSON)
                 .body(Mono.just(quizDTO), QuizDTO.class)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody().jsonPath("$.id").isEqualTo(2).returnResult()
+                .expectBody().jsonPath("$.id").isEqualTo(lastId+1).returnResult()
         );
-        webTestClient
+
+        System.out.println(webTestClient
                 .delete()
-                .uri(String.format(Objects.requireNonNull(environment.getProperty("deleteQuiz")), 2))
+                .uri(String.format(Objects.requireNonNull(environment.getProperty("deleteQuiz")), lastId+1))
                 .accept(APPLICATION_JSON)
-                .exchange();
+                .exchange()
+                .expectStatus().isOk());
 
     }
 
     @Test
     void getAllShouldSuccess() {
-        webTestClient
+        System.out.println(webTestClient
                 .get()
                 .uri(Objects.requireNonNull(environment.getProperty("getAllQuizes")))
                 .accept(MediaType.APPLICATION_JSON_UTF8)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBodyList(QuizDTO.class).hasSize(1);
+                .expectBodyList(QuizDTO.class).hasSize(1).returnResult());
     }
 
     private QuizDTO getQuizDTO() {

@@ -1,5 +1,6 @@
 package com.rest.quiz.restQuiz.dto;
 
+import com.rest.quiz.restQuiz.model.QuizState;
 import lombok.*;
 
 import java.util.Date;
@@ -17,5 +18,6 @@ public class QuizDTO {
     private Date startDate;
     private Date endDate;
     private boolean activity;
+    private QuizState quizState;
 
 }

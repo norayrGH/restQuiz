@@ -51,5 +51,10 @@ public class QuizControllerImpl implements QuizController {
     public ResponseEntity getAll() {
         return ResponseEntity.ok().body(quizService.getAllQuizes());
     }
+    @Override
+    @GetMapping(value = "/last")
+    public ResponseEntity getLast() {
+        return ResponseEntity.ok().body(quizService.findLastId());
+    }
 
 }

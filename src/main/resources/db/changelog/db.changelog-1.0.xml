@@ -17,25 +17,26 @@
             <column name="quiz_name" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="activity" type="boolean">
-                <constraints nullable="false"/>
-            </column>
             <column name="end_date" type="DATETIME">
                 <constraints nullable="false"/>
             </column>
             <column name="start_date" type="DATETIME">
                 <constraints nullable="false"/>
             </column>
+            <column name="quiz_state" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+
 
         </createTable>
     </changeSet>
     <changeSet author="liquibase-docs" id="addColumns_quiz">
 
         <insert schemaName="public" tableName="QUIZ">
-            <column name="activity" valueBoolean="false"/>
             <column name="quiz_name" value="Кто будет первым в списке форбс."/>
             <column name="end_date" valueDate="2019-10-27 14:53:39.309000"/>
             <column name="start_date" valueDate="2019-10-26 00:00:00.000000"/>
+            <column name="quiz_state" value="ACTIVE"/>
         </insert>
 
     </changeSet>

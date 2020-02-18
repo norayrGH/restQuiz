@@ -20,4 +20,7 @@ public interface QuizController {
 
     @GetMapping(value = "")
     ResponseEntity getAll();
+
+    @GetMapping(value = "/last")
+    ResponseEntity getLast();
 }

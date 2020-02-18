@@ -21,6 +21,6 @@ public interface QuizController {
     @GetMapping(value = "")
     ResponseEntity getAll();
 
-    @GetMapping(value = "/last")
-    ResponseEntity getLast();
+    @GetMapping(value = "/{id}/state")
+    ResponseEntity getQuizStateById(@PathVariable("id") long quizId);
 }

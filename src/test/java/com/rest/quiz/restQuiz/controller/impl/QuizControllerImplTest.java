@@ -92,6 +92,19 @@ class QuizControllerImplTest {
                 .exchange()
                 .expectStatus().isOk();
 
+
+        System.out.println(this.webTestClient
+                .get()
+                .uri(String.format(Objects.requireNonNull(environment.getProperty("getQuizStateById")), 1))
+                .header(ACCEPT, APPLICATION_JSON_VALUE)
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectHeader()
+                .contentType(APPLICATION_JSON)
+                .expectBody()
+                .jsonPath("$.state").isEqualTo("DELETED").returnResult());
+
     }
 
     @Test

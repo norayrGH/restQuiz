@@ -5,6 +5,7 @@ import com.rest.quiz.restQuiz.dto.QuizQuestionDTO;
 import com.rest.quiz.restQuiz.exeption.QuizNotFoundException;
 import com.rest.quiz.restQuiz.model.Quiz;
 import com.rest.quiz.restQuiz.model.QuizQuestion;
+import com.rest.quiz.restQuiz.model.QuizState;
 import com.rest.quiz.restQuiz.repository.QuizQuestionRepository;
 import com.rest.quiz.restQuiz.repository.QuizRepository;
 import com.rest.quiz.restQuiz.service.mapper.MapModel;
@@ -85,6 +86,10 @@ public class QuizService {
 
     public void deleteQuiz(long quizId) {
         quizRepository.deleteById(quizId);
+    }
+
+    public QuizState getQuizStateById(long quizId){
+        return quizRepository.getQuizStateById(quizId);
     }
 
     public Long findLastId(){

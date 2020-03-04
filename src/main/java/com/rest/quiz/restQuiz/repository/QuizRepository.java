@@ -10,7 +10,9 @@ import org.springframework.stereotype.Repository;
 public interface QuizRepository extends JpaRepository<Quiz, Long> {
 
      Quiz findTopByOrderByIdDesc();
-     @Query("select q.quizState from #{#entityName} q where q.id = ?1 ")
-     QuizState getQuizStateById(Long id);
+
+     @Query("select q from #{#entityName} q where q.id = ?1 and q.quizState = ?2")
+     Quiz getQuizStateById(Long id, QuizState quizState);
+
 
 }

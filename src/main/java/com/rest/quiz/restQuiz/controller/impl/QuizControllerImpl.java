@@ -2,6 +2,7 @@ package com.rest.quiz.restQuiz.controller.impl;
 
 import com.rest.quiz.restQuiz.controller.QuizController;
 import com.rest.quiz.restQuiz.dto.QuizDTO;
+import com.rest.quiz.restQuiz.model.QuizState;
 import com.rest.quiz.restQuiz.service.QuizService;
 import jdk.nashorn.internal.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,9 +54,9 @@ public class QuizControllerImpl implements QuizController {
     }
 
     @Override
-    @GetMapping(value = "/{id}/state")
-    public ResponseEntity getQuizStateById(@PathVariable("id") long quizId) {
-        return ResponseEntity.ok().body(quizService.getQuizStateById(quizId));
+    @GetMapping(value = "/{id}/state/{quizState}")
+    public ResponseEntity getQuizStateById(@PathVariable("id") long quizId, @PathVariable("quizState") String quizState) {
+        return ResponseEntity.ok().body(quizService.getQuizStateById(quizId, quizState));
     }
 
 }

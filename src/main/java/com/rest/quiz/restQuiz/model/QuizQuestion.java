@@ -9,14 +9,6 @@ import java.util.Objects;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(
-        uniqueConstraints =  @UniqueConstraint(
-                columnNames = {
-                        "displayOrder",
-                        "quiz_id"
-                }
-        )
-)
 @Getter
 @Setter
 public class QuizQuestion {
@@ -24,7 +16,6 @@ public class QuizQuestion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn
     private Quiz quiz;
     private String question;
     private Integer displayOrder;

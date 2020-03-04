@@ -45,7 +45,7 @@ public class QuizService {
 
     @Transactional
     public List<QuizDTO> getAllQuizes() {
-        List<Quiz> quizzes = (List<Quiz>) quizRepository.findAll();
+        List<Quiz> quizzes = quizRepository.findAll();
         if (quizzes.isEmpty())
             throw new QuizNotFoundException("Any quiz not found.");
         return quizzes.stream()
@@ -88,10 +88,11 @@ public class QuizService {
         quizRepository.deleteById(quizId);
     }
 
-    public QuizState getQuizStateById(long quizId){
-        return quizRepository.getQuizStateById(quizId);
+    @Transactional
+    public QuizDTO getQuizStateById(long quizId, String quizState){
+        return mapModel.convertToDto(quizRepository.getQuizStateById(quizId, QuizState.valueOf(quizState)));
     }
-
+    @Transactional
     public Long findLastId(){
         return quizRepository.findTopByOrderByIdDesc().getId();
     }

@@ -8,9 +8,11 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class QuizQuestionDTO {
+
     private Long id;
     private String question;
     private int displayOrder;
     @JsonIgnore
     private Long quizId;
+
 }

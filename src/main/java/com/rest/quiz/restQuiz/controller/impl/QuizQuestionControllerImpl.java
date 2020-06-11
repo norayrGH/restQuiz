@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(value = "/quizes/{quizeId}/question/")
+@RequestMapping(value = "/quizes/questions/")
 public class QuizQuestionControllerImpl implements QuizQuestionController {
 
     private final QuizService quizService;
@@ -27,7 +27,8 @@ public class QuizQuestionControllerImpl implements QuizQuestionController {
 
     @Override
     public ResponseEntity updateById(QuizQuestionDTO quizQuestionDTO, long quizQuestionId) {
-        return null;
+
+        return ResponseEntity.ok().body(quizService.updateQuizQuestion(quizQuestionDTO, quizQuestionId));
     }
 
     @Override

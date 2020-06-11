@@ -1,0 +1,959 @@
+Index: src/main/java/com/rest/quiz/restQuiz/configuration/DozerConfig.java
+===================================================================
+--- src/main/java/com/rest/quiz/restQuiz/configuration/DozerConfig.java	(date 1583310135000)
++++ src/main/java/com/rest/quiz/restQuiz/configuration/DozerConfig.java	(date 1583310135000)
+@@ -1,41 +0,0 @@
+-package com.rest.quiz.restQuiz.configuration;
+-
+-import com.rest.quiz.restQuiz.dto.QuizDTO;
+-import com.rest.quiz.restQuiz.dto.QuizQuestionDTO;
+-import com.rest.quiz.restQuiz.model.Quiz;
+-import com.rest.quiz.restQuiz.model.QuizQuestion;
+-import com.rest.quiz.restQuiz.service.mapper.QuizQuestionDTOConvert;
+-import org.dozer.DozerBeanMapper;
+-import org.dozer.classmap.RelationshipType;
+-import org.dozer.loader.api.BeanMappingBuilder;
+-import org.dozer.loader.api.FieldsMappingOptions;
+-import org.dozer.loader.api.TypeMappingOptions;
+-import org.springframework.context.annotation.Bean;
+-import org.springframework.context.annotation.Configuration;
+-
+-import static org.dozer.loader.api.FieldsMappingOptions.*;
+-import static org.dozer.loader.api.TypeMappingOptions.mapNull;
+-
+-@Configuration
+-public class DozerConfig {
+-
+-    @Bean
+-    public BeanMappingBuilder beanMappingBuilder() {
+-        return new BeanMappingBuilder() {
+-            @Override
+-            protected void configure() {
+-                mapping(QuizDTO.class, Quiz.class,mapNull(false),
+-                        TypeMappingOptions.oneWay())
+-                        .fields("quizQuestionList", "quizQuestionList",
+-                                FieldsMappingOptions.oneWay(), customConverter(QuizQuestionDTOConvert.class));
+-            }
+-        };
+-    }
+-    @Bean
+-    public DozerBeanMapper beanMapper() {
+-        DozerBeanMapper dozerBeanMapper = new DozerBeanMapper();
+-        dozerBeanMapper.addMapping(beanMappingBuilder());
+-        return dozerBeanMapper;
+-    }
+-
+-}
+Index: src/main/java/com/rest/quiz/restQuiz/model/QuizQuestion.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/com/rest/quiz/restQuiz/model/QuizQuestion.java	(date 1583310135000)
++++ src/main/java/com/rest/quiz/restQuiz/model/QuizQuestion.java	(date 1583310135000)
+@@ -1,35 +0,0 @@
+-package com.rest.quiz.restQuiz.model;
+-
+-import lombok.*;
+-
+-import javax.persistence.*;
+-import java.util.Objects;
+-
+-@Data
+-@Entity
+-@NoArgsConstructor
+-@AllArgsConstructor
+-@Getter
+-@Setter
+-public class QuizQuestion {
+-    @Id
+-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+-    private Long id;
+-    @ManyToOne(fetch = FetchType.LAZY)
+-    private Quiz quiz;
+-    private String question;
+-    private Integer displayOrder;
+-
+-    @Override
+-    public boolean equals(Object o) {
+-        if (this == o) return true;
+-        if (o == null || getClass() != o.getClass()) return false;
+-        QuizQuestion that = (QuizQuestion) o;
+-        return getId() == that.getId();
+-    }
+-
+-    @Override
+-    public int hashCode() {
+-        return Objects.hash(getId());
+-    }
+-}
+Index: src/main/java/com/rest/quiz/restQuiz/service/mapper/QuizQuestionDTOConvert.java
+===================================================================
+--- src/main/java/com/rest/quiz/restQuiz/service/mapper/QuizQuestionDTOConvert.java	(date 1583310135000)
++++ src/main/java/com/rest/quiz/restQuiz/service/mapper/QuizQuestionDTOConvert.java	(date 1583310135000)
+@@ -1,43 +0,0 @@
+-package com.rest.quiz.restQuiz.service.mapper;
+-
+-import com.rest.quiz.restQuiz.dto.QuizQuestionDTO;
+-import com.rest.quiz.restQuiz.model.QuizQuestion;
+-import org.dozer.DozerConverter;
+-import org.dozer.Mapper;
+-import org.dozer.MapperAware;
+-import java.util.List;
+-
+-public class QuizQuestionDTOConvert extends DozerConverter<List, List> implements MapperAware {
+-
+-
+-    public QuizQuestionDTOConvert() {
+-        super(List.class, List.class);
+-    }
+-
+-    @Override
+-    public List convertTo(List source, List destination) {
+-        return null;
+-    }
+-
+-    @Override
+-    public List convertFrom(List source, List destination) {
+-        for (int i = 0; i < source.size(); i++) {
+-            QuizQuestionDTO quizQuestionDTO = (QuizQuestionDTO) source.get(i);
+-            if (i >= destination.size()) {
+-                QuizQuestion quizQuestion = (QuizQuestion) destination.get(i - 1);
+-                destination.add(new QuizQuestion(null, quizQuestion.getQuiz(), quizQuestionDTO.getQuestion(), quizQuestionDTO.getDisplayOrder()));
+-            } else {
+-                QuizQuestion quizQuestion = (QuizQuestion) destination.get(i);
+-                quizQuestion.setQuestion(quizQuestionDTO.getQuestion());
+-                quizQuestion.setDisplayOrder(quizQuestionDTO.getDisplayOrder());
+-                destination.set(i, quizQuestion);
+-            }
+-        }
+-        return destination;
+-    }
+-
+-    @Override
+-    public void setMapper(Mapper mapper) {
+-
+-    }
+-}
+\ No newline at end of file
+Index: src/test/resources/db/changelog/db.changelog-1.0.xml
+===================================================================
+--- src/test/resources/db/changelog/db.changelog-1.0.xml	(date 1583310135000)
++++ src/test/resources/db/changelog/db.changelog-1.0.xml	(date 1583310135000)
+@@ -1,91 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<databaseChangeLog
+-        xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9
+-                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+-    <changeSet author="liquibase-docs" id="create_table_quiz_test">
+-        <preConditions onFail="MARK_RAN">
+-            <not>
+-                <tableExists  tableName="quiz"/>
+-            </not>
+-        </preConditions>
+-        <createTable  tableName="quiz">
+-            <column autoIncrement="true" name="id" type="BIGINT">
+-                <constraints nullable="false" primaryKey="true"/>
+-            </column>
+-            <column name="quiz_name" type="VARCHAR(255)">
+-                <constraints nullable="false"/>
+-            </column>
+-            <column name="end_date" type="DATETIME">
+-                <constraints nullable="false"/>
+-            </column>
+-            <column name="start_date" type="DATETIME">
+-                <constraints nullable="false"/>
+-            </column>
+-            <column name="quiz_state" type="VARCHAR(255)">
+-                <constraints nullable="false"/>
+-            </column>
+-
+-        </createTable>
+-    </changeSet>
+-    <changeSet author="liquibase-docs" id="addColumns_quiz_test">
+-
+-        <insert  tableName="quiz">
+-            <column name="quiz_name" value="Кто будет первым в списке форбс."/>
+-            <column name="end_date" valueDate="2019-10-27 14:53:39.309000"/>
+-            <column name="start_date" valueDate="2019-10-26 00:00:00.000000"/>
+-            <column name="quiz_state" value="ACTIVE"/>
+-        </insert>
+-
+-    </changeSet>
+-    <changeSet author="liquibase-docs" id="create_table_quiz_question_test">
+-        <preConditions onFail="MARK_RAN">
+-            <not>
+-                <tableExists  tableName="quiz_question"/>
+-            </not>
+-        </preConditions>
+-        <createTable  tableName="quiz_question">
+-            <column autoIncrement="true" name="id" type="BIGINT">
+-                <constraints nullable="false" primaryKey="true"/>
+-            </column>
+-            <column name="display_order" type="BIGINT">
+-                <constraints nullable="false"/>
+-            </column>
+-            <column name="question" type="VARCHAR(255)">
+-                <constraints nullable="false"/>
+-            </column>
+-            <column name="quiz_id" type="BIGINT">
+-                <constraints nullable="false"/>
+-            </column>
+-        </createTable>
+-        <addForeignKeyConstraint baseColumnNames="quiz_id"
+-                                 baseTableName="quiz_question"
+-                                 constraintName="quiz_id"
+-                                 onDelete="CASCADE"
+-                                 onUpdate="RESTRICT"
+-                                 referencedColumnNames="id"
+-                                 referencedTableName="quiz"/>
+-    </changeSet>
+-    <changeSet author="liquibase-docs" id="addColumn_quiz_question_test">
+-
+-        <insert   tableName="quiz_question">
+-            <column name="display_order" valueNumeric="1"/>
+-            <column name="question" value="Рокфейлер"/>
+-            <column name="quiz_id" valueNumeric="1"/>
+-        </insert>
+-
+-        <insert  tableName="quiz_question">
+-            <column name="display_order" valueNumeric="2"/>
+-            <column name="question" value="Родшельд"/>
+-            <column name="quiz_id" valueNumeric="1"/>
+-        </insert>
+-
+-        <insert  tableName="quiz_question">
+-            <column name="display_order" valueNumeric="3"/>
+-            <column name="question" value="Ты штольи ?"/>
+-            <column name="quiz_id" valueNumeric="1"/>
+-        </insert>
+-
+-    </changeSet>
+-</databaseChangeLog>
+Index: src/test/resources/db/changelog/db.changelog-master.xml
+===================================================================
+--- src/test/resources/db/changelog/db.changelog-master.xml	(date 1583310135000)
++++ src/test/resources/db/changelog/db.changelog-master.xml	(date 1583310135000)
+@@ -1,9 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<databaseChangeLog
+-        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+-                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+-
+-    <include file="db/changelog/db.changelog-1.0.xml"/>
+-</databaseChangeLog>
+Index: src/main/resources/api.calls.properties
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1251
+===================================================================
+--- src/main/resources/api.calls.properties	(date 1583310135000)
++++ src/main/resources/api.calls.properties	(date 1591810442409)
+@@ -4,3 +4,5 @@
+ createQuiz=/quizes
+ getAllQuizes=/quizes
+ getQuizStateById=/quizes/{id}/state
++getQuizQuestionById=/quizes/questions/%d
++updateQuizQuestionById=/quizes/questions/%d
+Index: src/main/java/com/rest/quiz/restQuiz/service/mapper/MapModel.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/com/rest/quiz/restQuiz/service/mapper/MapModel.java	(date 1583310135000)
++++ src/main/java/com/rest/quiz/restQuiz/service/mapper/MapModel.java	(date 1591813281437)
+@@ -3,54 +3,49 @@
+ import com.rest.quiz.restQuiz.dto.QuizDTO;
+ import com.rest.quiz.restQuiz.dto.QuizQuestionDTO;
+ import com.rest.quiz.restQuiz.model.Quiz;
++
+ import com.rest.quiz.restQuiz.model.QuizQuestion;
+-import org.dozer.DozerBeanMapper;
+-import org.dozer.Mapper;
+-import org.springframework.beans.factory.annotation.Autowired;
++import org.modelmapper.ModelMapper;
+ import org.springframework.stereotype.Service;
+ 
+-import javax.transaction.Transactional;
++import java.util.Objects;
++
+ 
+ @Service
+ public class MapModel {
+ 
+-    private Mapper dozerMapper = new DozerBeanMapper();
++    private final ModelMapper modelMapper;
+ 
+-    private final DozerBeanMapper dozerBeanMapper;
+ 
+-    public MapModel(DozerBeanMapper dozerBeanMapper) {
+-        this.dozerBeanMapper = dozerBeanMapper;
++    public MapModel(ModelMapper modelMapper) {
++        this.modelMapper = modelMapper;
+     }
+ 
+     public QuizDTO convertToDto(Quiz quiz) {
+-        return dozerMapper.map(quiz, QuizDTO.class);
++        return modelMapper.map(quiz, QuizDTO.class);
+     }
+     public QuizQuestionDTO convertToDto(QuizQuestion quizQuestion) {
+-        return dozerMapper.map(quizQuestion, QuizQuestionDTO.class);
++        return modelMapper.map(quizQuestion, QuizQuestionDTO.class);
+     }
+ 
+     public Quiz convertToEntity(QuizDTO quizDTO) {
+-        Quiz quiz = dozerMapper.map(quizDTO, Quiz.class);
+-        if(!quiz.getQuizQuestionList().isEmpty()) {
++        Quiz quiz = modelMapper.map(quizDTO, Quiz.class);
++        if(Objects.nonNull(quiz) && Objects.nonNull(quiz.getQuizQuestionList()) && !quiz.getQuizQuestionList().isEmpty()) {
+             quiz.getQuizQuestionList().forEach(x -> x.setQuiz(quiz));
+         }
+         return quiz;
+     }
+ 
+     public QuizQuestion convertToEntity(QuizQuestionDTO quizQuestionDTO) {
+-        QuizQuestion quizQuestion = dozerMapper.map(quizQuestionDTO, QuizQuestion.class);
+-        return quizQuestion;
++        return modelMapper.map(quizQuestionDTO, QuizQuestion.class);
+     }
+ 
+-    public void mapForUpdate(QuizQuestionDTO quizDTO, QuizQuestion quiz) {
+-        dozerMapper.map(quizDTO, quiz);
++    public void mapForUpdate(QuizQuestion quizForUpdate, QuizQuestion quiz) {
++        modelMapper.map(quizForUpdate, quiz);
+     }
+ 
+-    public void mapForUpdate(QuizDTO quizDTO, Quiz quiz) {
+-        dozerBeanMapper.map(quizDTO,quiz);
++    public void mapForUpdate(Quiz quizDto, Quiz quiz) {
++        modelMapper.map(quizDto,quiz);
+     }
+ 
+-    public Mapper getDozerMapper() {
+-        return dozerMapper;
+-    }
+ }
+Index: src/main/java/com/rest/quiz/restQuiz/dto/QuizQuestionDTO.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/com/rest/quiz/restQuiz/dto/QuizQuestionDTO.java	(date 1583310135000)
++++ src/main/java/com/rest/quiz/restQuiz/dto/QuizQuestionDTO.java	(date 1584890693126)
+@@ -8,9 +8,11 @@
+ @AllArgsConstructor
+ @NoArgsConstructor
+ public class QuizQuestionDTO {
++
+     private Long id;
+     private String question;
+     private int displayOrder;
+     @JsonIgnore
+     private Long quizId;
++
+ }
+Index: src/main/java/com/rest/quiz/restQuiz/configuration/ApiConfiguration.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/com/rest/quiz/restQuiz/configuration/ApiConfiguration.java	(date 1583310135000)
++++ src/main/java/com/rest/quiz/restQuiz/configuration/ApiConfiguration.java	(date 1591803466520)
+@@ -1,9 +1,10 @@
+ package com.rest.quiz.restQuiz.configuration;
+ 
+-import org.dozer.DozerBeanMapper;
+-import org.dozer.Mapper;
+-import org.springframework.beans.factory.annotation.Autowired;
+-import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
++import com.rest.quiz.restQuiz.dto.QuizDTO;
++import com.rest.quiz.restQuiz.dto.QuizQuestionDTO;
++import com.rest.quiz.restQuiz.model.Quiz;
++import com.rest.quiz.restQuiz.model.QuizQuestion;
++import org.modelmapper.ModelMapper;
+ import org.springframework.context.annotation.Bean;
+ import org.springframework.context.annotation.Configuration;
+ import springfox.documentation.builders.PathSelectors;
+@@ -14,18 +15,11 @@
+ import springfox.documentation.spring.web.plugins.Docket;
+ import springfox.documentation.swagger2.annotations.EnableSwagger2;
+ 
+-import java.util.Arrays;
+ import java.util.Collections;
+ 
+ @Configuration
+ @EnableSwagger2
+ public class ApiConfiguration {
+-    private final DataSourceProperties dataSourceProperties;
+-
+-    @Autowired
+-    public ApiConfiguration(DataSourceProperties dataSourceProperties) {
+-        this.dataSourceProperties = dataSourceProperties;
+-    }
+ 
+     @Bean
+     public Docket api() {
+@@ -48,7 +42,31 @@
+     }
+ 
+     @Bean
+-    public Mapper dozerBeanMapper() {
+-        return new DozerBeanMapper(Arrays.asList("classpath:dozer_mapping.xml"));
++    public ModelMapper modelMapper() {
++        ModelMapper modelMapper = new ModelMapper();
++
++        modelMapper.typeMap(Quiz.class, QuizDTO.class).addMappings(mapper -> {
++            mapper.map( Quiz::getId,QuizDTO::setId );
++            mapper.map( Quiz::getQuizName,QuizDTO::setQuizName );
++            mapper.map( Quiz::getQuizQuestionList,QuizDTO::setQuizQuestionList);
++            mapper.map( Quiz::getStartDate,QuizDTO::setStartDate);
++            mapper.map( Quiz::getEndDate,QuizDTO::setEndDate);
++            mapper.map( Quiz::getQuizState,QuizDTO::setQuizState);
++        });
++        modelMapper.typeMap(QuizDTO.class, Quiz.class).addMappings(mapper -> {
++            mapper.map( QuizDTO::getId,Quiz::setId );
++            mapper.map( QuizDTO::getQuizName,Quiz::setQuizName );
++            mapper.map( QuizDTO::getQuizQuestionList,Quiz::setQuizQuestionList);
++            mapper.map( QuizDTO::getStartDate,Quiz::setStartDate);
++            mapper.map( QuizDTO::getEndDate,Quiz::setEndDate);
++            mapper.map( QuizDTO::getQuizState,Quiz::setQuizState);
++        });
++
++        modelMapper.typeMap(QuizQuestion.class, QuizQuestionDTO.class).addMappings(mapper -> {
++            mapper.map( QuizQuestion::getId,QuizQuestionDTO::setId );
++            mapper.map( src->src.getQuestion().getQuestion(),QuizQuestionDTO::setQuestion );
++            mapper.map( QuizQuestion::getDisplayOrder,QuizQuestionDTO::setDisplayOrder );
++        });
++        return modelMapper;
+     }
+ }
+Index: pom.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- pom.xml	(date 1583310135000)
++++ pom.xml	(date 1587557085376)
+@@ -39,10 +39,11 @@
+ 			<version>2.0.2</version>
+ 		</dependency>
+ 
++		<!-- https://mvnrepository.com/artifact/org.modelmapper/modelmapper -->
+ 		<dependency>
+-			<groupId>net.sf.dozer</groupId>
+-			<artifactId>dozer</artifactId>
+-			<version>5.5.1</version>
++			<groupId>org.modelmapper</groupId>
++			<artifactId>modelmapper</artifactId>
++			<version>2.3.7</version>
+ 		</dependency>
+ 
+ 		<dependency>
+Index: src/test/java/com/rest/quiz/restQuiz/controller/impl/QuizControllerImplTest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/test/java/com/rest/quiz/restQuiz/controller/impl/QuizControllerImplTest.java	(date 1583310135000)
++++ src/test/java/com/rest/quiz/restQuiz/controller/impl/QuizControllerImplTest.java	(date 1591813752262)
+@@ -2,16 +2,12 @@
+ 
+ import com.rest.quiz.restQuiz.dto.QuizDTO;
+ import com.rest.quiz.restQuiz.dto.QuizQuestionDTO;
+-import com.rest.quiz.restQuiz.model.Quiz;
+-import com.rest.quiz.restQuiz.model.QuizQuestion;
+-import com.rest.quiz.restQuiz.repository.QuizRepository;
+ import com.rest.quiz.restQuiz.service.QuizService;
+ import org.junit.jupiter.api.Test;
+ import org.junit.runner.RunWith;
+ import org.springframework.beans.factory.annotation.Autowired;
+ import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
+ import org.springframework.boot.test.context.SpringBootTest;
+-import org.springframework.boot.test.mock.mockito.MockBean;
+ import org.springframework.context.annotation.PropertySource;
+ import org.springframework.core.env.Environment;
+ import org.springframework.http.MediaType;
+@@ -20,9 +16,6 @@
+ import org.springframework.test.web.reactive.server.WebTestClient;
+ import reactor.core.publisher.Mono;
+ 
+-import java.util.ArrayList;
+-import java.util.Date;
+-import java.util.List;
+ import java.util.Objects;
+ 
+ import static com.google.common.net.HttpHeaders.ACCEPT;
+@@ -65,7 +58,7 @@
+ 
+     @Test
+     void updateByIdShouldSuccess() {
+-        QuizDTO quizDTO = new QuizDTO();
++        QuizDTO quizDTO = getQuizDTO();
+         quizDTO.setQuizName("Поменял вопрос");
+         System.out.println(this.webTestClient
+                 .put()
+@@ -81,35 +74,9 @@
+                 .jsonPath("$.quizName").isEqualTo("Поменял вопрос").returnResult());
+     }
+ 
+-    @Test
+-    void  deleteByIdShouldSuccess() {
+-        //Long lastId = quizService.findLastId();
+-
+-        webTestClient
+-                .delete()
+-                .uri(String.format(Objects.requireNonNull(environment.getProperty("deleteQuiz")), 1))
+-                .accept(APPLICATION_JSON)
+-                .exchange()
+-                .expectStatus().isOk();
+-
+-
+-
+-//        System.out.println(this.webTestClient
+-//                .get()
+-//                .uri(String.format(Objects.requireNonNull(environment.getProperty("getQuizStateById")), 1))
+-//                .header(ACCEPT, APPLICATION_JSON_VALUE)
+-//                .exchange()
+-//                .expectStatus()
+-//                .is2xxSuccessful()
+-//                .expectHeader()
+-//                .contentType(APPLICATION_JSON)
+-//                .expectBody()
+-//                .jsonPath("$.state").isEqualTo("DELETED").returnResult());
+-
+-    }
+ 
+     @Test
+-    void createShouldSuccess() {
++    void createAndDeleteShouldSuccess() {
+         QuizDTO quizDTO = getQuizDTO();
+         Long lastId = quizService.findLastId();
+         System.out.println(webTestClient.post().uri(Objects.requireNonNull(environment.getProperty("createQuiz")))
+@@ -138,13 +105,54 @@
+                 .accept(MediaType.APPLICATION_JSON_UTF8)
+                 .exchange()
+                 .expectStatus().isOk()
+-                .expectBodyList(QuizDTO.class).hasSize(2).returnResult()) ;
++                .expectBodyList(QuizDTO.class).hasSize(1).returnResult()) ;
++    }
++
++
++
++    @Test
++    void getByIdQuizQuestionShouldSuccess() {
++        System.out.println(this.webTestClient
++                .get()
++                .uri(String.format(Objects.requireNonNull(environment.getProperty("getQuizQuestionById")), 1))
++                .header(ACCEPT, APPLICATION_JSON_VALUE)
++                .exchange()
++                .expectStatus()
++                .is2xxSuccessful()
++                .expectHeader()
++                .contentType(APPLICATION_JSON)
++                .expectBody()
++                .jsonPath("$.question").isNotEmpty().returnResult());
++    }
++
++    @Test
++    void updateQuizQuestionByIdShouldSuccess() {
++        QuizQuestionDTO quizQuestionDTO = getQuizQuestionDTO();
++        quizDTO.setQuizName("Поменял вопрос");
++        System.out.println(this.webTestClient
++                .put()
++                .uri(String.format(Objects.requireNonNull(environment.getProperty("updateQuiz")), 1))
++                .contentType(APPLICATION_JSON)
++                .accept(APPLICATION_JSON)
++                .header(ACCEPT, APPLICATION_JSON_VALUE)
++                .body(Mono.just(quizDTO), QuizDTO.class)
++                .exchange()
++                .expectStatus()
++                .is2xxSuccessful()
++                .expectBody()
++                .jsonPath("$.quizName").isEqualTo("Поменял вопрос").returnResult());
++    }
++
++    private QuizQuestionDTO getQuizQuestionDTO() {
++        QuizQuestionDTO quizQuestionDTO = quizService.getQuizQuestionById(1L);
++        quizQuestionDTO.setId(null);
++        return quizQuestionDTO;
+     }
+ 
+     private QuizDTO getQuizDTO() {
+         QuizDTO quizDTO = quizService.getQuizById(1L);
+         quizDTO.setId(null);
+-        for(QuizQuestionDTO quizQuestionDto:quizDTO.getQuizQuestionList()){
++        for(QuizQuestionDTO quizQuestionDto :quizDTO.getQuizQuestionList()){
+             quizQuestionDto.setId(null);
+         }
+         return quizDTO;
+Index: src/main/java/com/rest/quiz/restQuiz/controller/impl/QuizQuestionControllerImpl.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/com/rest/quiz/restQuiz/controller/impl/QuizQuestionControllerImpl.java	(date 1583310135000)
++++ src/main/java/com/rest/quiz/restQuiz/controller/impl/QuizQuestionControllerImpl.java	(date 1591811974948)
+@@ -8,7 +8,7 @@
+ import org.springframework.web.bind.annotation.*;
+ 
+ @RestController
+-@RequestMapping(value = "/quizes/{quizeId}/question/")
++@RequestMapping(value = "/quizes/questions/")
+ public class QuizQuestionControllerImpl implements QuizQuestionController {
+ 
+     private final QuizService quizService;
+@@ -27,7 +27,8 @@
+ 
+     @Override
+     public ResponseEntity updateById(QuizQuestionDTO quizQuestionDTO, long quizQuestionId) {
+-        return null;
++
++        return ResponseEntity.ok().body(quizService.updateQuizQuestion(quizQuestionDTO, quizQuestionId));
+     }
+ 
+     @Override
+Index: src/main/java/com/rest/quiz/restQuiz/model/Question.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/com/rest/quiz/restQuiz/model/Question.java	(date 1584803387627)
++++ src/main/java/com/rest/quiz/restQuiz/model/Question.java	(date 1584803387627)
+@@ -0,0 +1,22 @@
++package com.rest.quiz.restQuiz.model;
++
++import lombok.*;
++
++import javax.persistence.*;
++import java.util.Objects;
++
++@Data
++@Entity
++@NoArgsConstructor
++@AllArgsConstructor
++@Getter
++@Setter
++public class Question {
++
++    @Id
++    @GeneratedValue(strategy = GenerationType.IDENTITY)
++    private Long id;
++    private String question;
++
++
++}
+Index: src/main/java/com/rest/quiz/restQuiz/model/Quiz.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/com/rest/quiz/restQuiz/model/Quiz.java	(date 1583310135000)
++++ src/main/java/com/rest/quiz/restQuiz/model/Quiz.java	(date 1591803019557)
+@@ -1,10 +1,14 @@
+ package com.rest.quiz.restQuiz.model;
+ 
+ import lombok.*;
++import org.hibernate.annotations.BatchSize;
++import org.hibernate.annotations.Fetch;
++import org.hibernate.annotations.FetchMode;
+ import org.hibernate.annotations.ResultCheckStyle;
+ import org.hibernate.annotations.SQLDelete;
+ 
+ import javax.persistence.*;
++import java.util.ArrayList;
+ import java.util.Date;
+ import java.util.List;
+ import java.util.Objects;
+@@ -14,38 +18,20 @@
+ @Entity
+ @AllArgsConstructor
+ @NoArgsConstructor
+-@SQLDelete(sql = "UPDATE {h-schema}quiz SET quiz_state = 'DELETED', quiz_id = null FROM {h-schema}quiz_question WHERE {h-schema}quiz.id = ? AND {h-schema}quiz.id = {h-schema}quiz_question.quiz_id ", check = ResultCheckStyle.COUNT)
+ public class Quiz {
+     @Id
+     @GeneratedValue(strategy = GenerationType.IDENTITY)
+     private Long id;
+     private String quizName;
+-    @OneToMany(
+-            cascade = CascadeType.ALL
+-    )
+-    @JoinTable(
+-            name = "quiz_and_question",
+-            joinColumns = @JoinColumn(name = "quiz_id"),
+-            inverseJoinColumns = @JoinColumn(name = "question_id")
+-    )
+-    private List<QuizQuestion> quizQuestionList;
++    @OneToMany(mappedBy = "quiz")
++    @Fetch(FetchMode.SELECT)
++    @BatchSize(size = 10)
++    private List<QuizQuestion> quizQuestionList = new ArrayList<>();
+     private Date startDate;
+     private Date endDate;
+     @Enumerated(EnumType.STRING)
+     private QuizState quizState = QuizState.ACTIVE;
+ 
+-    @Override
+-    public boolean equals(Object o) {
+-        if (this == o) return true;
+-        if (o == null || getClass() != o.getClass()) return false;
+-        Quiz quiz = (Quiz) o;
+-        return getId() == quiz.getId();
+-    }
+-
+-    @Override
+-    public int hashCode() {
+-        return Objects.hash(getId());
+-    }
+ 
+     @PreRemove
+     public void deleteUser() {
+Index: src/main/resources/db/changelog/db.changelog-1.0.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/resources/db/changelog/db.changelog-1.0.xml	(date 1583310135000)
++++ src/main/resources/db/changelog/db.changelog-1.0.xml	(date 1587563461206)
+@@ -10,7 +10,7 @@
+                 <tableExists tableName="QUIZ"/>
+             </not>
+         </preConditions>
+-        <createTable schemaName="public" tableName="QUIZ">
++        <createTable tableName="QUIZ">
+             <column autoIncrement="true" name="id" type="BIGINT">
+                 <constraints nullable="false" primaryKey="true"/>
+             </column>
+@@ -18,21 +18,19 @@
+                 <constraints nullable="false"/>
+             </column>
+             <column name="end_date" type="DATETIME">
+-                <constraints nullable="false"/>
++                <constraints nullable="true"/>
+             </column>
+             <column name="start_date" type="DATETIME">
+-                <constraints nullable="false"/>
++                <constraints nullable="true"/>
+             </column>
+             <column name="quiz_state" type="VARCHAR(255)">
+                 <constraints nullable="false"/>
+             </column>
+-
+-
+         </createTable>
+     </changeSet>
+     <changeSet author="liquibase-docs" id="addColumns_quiz">
+ 
+-        <insert schemaName="public" tableName="QUIZ">
++        <insert tableName="QUIZ">
+             <column name="quiz_name" value="Кто будет первым в списке форбс."/>
+             <column name="end_date" valueDate="2019-10-27 14:53:39.309000"/>
+             <column name="start_date" valueDate="2019-10-26 00:00:00.000000"/>
+@@ -40,53 +38,100 @@
+         </insert>
+ 
+     </changeSet>
++
++    <changeSet author="liquibase-docs" id="create_table_question">
++        <preConditions onFail="MARK_RAN">
++            <not>
++                <tableExists tableName="QUESTION"/>
++            </not>
++        </preConditions>
++        <createTable tableName="QUESTION">
++            <column autoIncrement="true" name="id" type="BIGINT">
++                <constraints nullable="false" primaryKey="true"/>
++            </column>
++            <column name="question" type="VARCHAR(255)">
++                <constraints nullable="false"/>
++            </column>
++        </createTable>
++    </changeSet>
++
++    <changeSet author="liquibase-docs" id="addColumn_question">
++
++        <insert  tableName="QUESTION">
++            <column name="question" value="Рокфейлер"/>
++        </insert>
++
++        <insert tableName="QUESTION">
++            <column name="question" value="Родшельд"/>
++        </insert>
++
++        <insert tableName="QUESTION">
++            <column name="question" value="Ты штольи ?"/>
++        </insert>
++
++    </changeSet>
++
+     <changeSet author="liquibase-docs" id="create_table_quiz_question">
+         <preConditions onFail="MARK_RAN">
+             <not>
+                 <tableExists tableName="QUIZ_QUESTION"/>
+             </not>
+         </preConditions>
+-        <createTable schemaName="public" tableName="QUIZ_QUESTION">
++        <createTable tableName="QUIZ_QUESTION">
++
+             <column autoIncrement="true" name="id" type="BIGINT">
+                 <constraints nullable="false" primaryKey="true"/>
+             </column>
+             <column name="display_order" type="BIGINT">
+                 <constraints nullable="false"/>
+             </column>
+-            <column name="question" type="VARCHAR(255)">
++            <column name="question_id" type="BIGINT">
+                 <constraints nullable="false"/>
+             </column>
+             <column name="quiz_id" type="BIGINT">
+                 <constraints nullable="false"/>
+             </column>
++
+         </createTable>
++
++        <addUniqueConstraint tableName="QUIZ_QUESTION"
++                             columnNames="quiz_id,display_order" />
++
+         <addForeignKeyConstraint baseColumnNames="quiz_id"
+                                  baseTableName="QUIZ_QUESTION"
+-                                 constraintName="quiz_id"
++                                 constraintName="quizFK"
+                                  onDelete="CASCADE"
+                                  onUpdate="RESTRICT"
+                                  referencedColumnNames="id"
+                                  referencedTableName="QUIZ"/>
++
++        <addForeignKeyConstraint baseColumnNames="question_id"
++                                 baseTableName="QUIZ_QUESTION"
++                                 constraintName="questionFK"
++                                 onDelete="NO ACTION"
++                                 onUpdate="RESTRICT"
++                                 referencedColumnNames="id"
++                                 referencedTableName="QUESTION"/>
+     </changeSet>
++
+     <changeSet author="liquibase-docs" id="addColumn_quiz_question">
+ 
+-        <insert schemaName="public" tableName="QUIZ_QUESTION">
++        <insert tableName="QUIZ_QUESTION">
+             <column name="display_order" valueNumeric="1"/>
+-            <column name="question" value="Рокфейлер"/>
++            <column name="question_id" valueNumeric="1"/>
+             <column name="quiz_id" valueNumeric="1"/>
+         </insert>
+ 
+-        <insert schemaName="public" tableName="QUIZ_QUESTION">
++        <insert tableName="QUIZ_QUESTION">
+             <column name="display_order" valueNumeric="2"/>
+-            <column name="question" value="Родшельд"/>
++            <column name="question_id" valueNumeric="2"/>
+             <column name="quiz_id" valueNumeric="1"/>
+         </insert>
+ 
+-        <insert schemaName="public" tableName="QUIZ_QUESTION">
++        <insert tableName="QUIZ_QUESTION">
+             <column name="display_order" valueNumeric="3"/>
+-            <column name="question" value="Ты штольи ?"/>
++            <column name="question_id" value="3"/>
+             <column name="quiz_id" valueNumeric="1"/>
+         </insert>
+-
+     </changeSet>
+ </databaseChangeLog>
+Index: src/main/java/com/rest/quiz/restQuiz/service/QuizService.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/com/rest/quiz/restQuiz/service/QuizService.java	(date 1583310135000)
++++ src/main/java/com/rest/quiz/restQuiz/service/QuizService.java	(date 1591813281517)
+@@ -10,16 +10,10 @@
+ import com.rest.quiz.restQuiz.repository.QuizRepository;
+ import com.rest.quiz.restQuiz.service.mapper.MapModel;
+ import lombok.AllArgsConstructor;
+-import org.dozer.DozerBeanMapper;
+ import org.springframework.stereotype.Service;
+ 
+-import javax.sql.DataSource;
+ import javax.transaction.Transactional;
+-import java.math.BigInteger;
+-import java.sql.SQLException;
+-import java.sql.Statement;
+ import java.util.List;
+-import java.util.Optional;
+ import java.util.Set;
+ import java.util.stream.Collectors;
+ 
+@@ -30,7 +24,6 @@
+     private final QuizRepository quizRepository;
+     private final QuizQuestionRepository quizQuestionRepository;
+     private final MapModel mapModel;
+-    private final DozerBeanMapper dozerBeanMapper;
+     @Transactional
+     public QuizDTO getQuizById(Long quizId) {
+         Quiz quiz = quizRepository.findById(quizId).orElseThrow(() -> new QuizNotFoundException("Quiz not Found with " + quizId + " id."));
+@@ -79,11 +72,22 @@
+         Quiz quizUpdate = quizRepository.findById(quizId).orElseThrow(() -> new QuizNotFoundException(
+                 "Quiz not Found with " + quizId + " id.")
+         );
+-
+-        dozerBeanMapper.map(quizDTO, quizUpdate);
++        Quiz quizForUpdate = mapModel.convertToEntity(quizDTO);
++        mapModel.mapForUpdate(quizForUpdate,quizUpdate);
+         return mapModel.convertToDto(quizRepository.save(quizUpdate));
+     }
+ 
++    @Transactional
++        public QuizQuestionDTO updateQuizQuestion(QuizQuestionDTO quizQuestionDTO, long quizId) {
++        quizQuestionDTO.setId(quizId);
++        QuizQuestion quizUpdate = quizQuestionRepository.findById(quizId).orElseThrow(() -> new QuizNotFoundException(
++                "QuizQuestion not Found with " + quizId + " id.")
++        );
++        QuizQuestion quizForUpdate = mapModel.convertToEntity(quizQuestionDTO);
++        mapModel.mapForUpdate(quizForUpdate,quizUpdate);
++        return mapModel.convertToDto(quizQuestionRepository.save(quizUpdate));
++    }
++
+     public void deleteQuiz(long quizId) {
+         quizRepository.deleteById(quizId);
+     }
+Index: src/main/resources/application.properties
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1251
+===================================================================
+--- src/main/resources/application.properties	(date 1583310135000)
++++ src/main/resources/application.properties	(date 1584822576178)
+@@ -2,18 +2,22 @@
+ spring.jpa.show-sql=true
+ spring.jpa.properties.hibernate.format_sql=true
+ spring.datasource.name=data
+-spring.jpa.hibernate.ddl-auto=update
++spring.jpa.hibernate.ddl-auto=none
++spring.jpa.properties.hibernate.default_schema=public
+ spring.datasource.url=jdbc:postgresql://localhost:5432/postgres
+ spring.datasource.username=postgres
+ spring.datasource.password=admin
++
+ logging.level.ROOT=INFO
+ logging.level.org.hibernate.SQL=DEBUG
+ logging.level.org.springframework.orm.jpa=DEBUG
+ logging.level.org.springframework.transaction=DEBUG
+ spring.jpa.open-in-view=false
+-#spring.liquibase.change-log=classpath:db/changelog/db.changelog-master.xml
+-spring.liquibase.enabled=false
+-#spring.liquibase.url=jdbc:postgresql://localhost:5432/postgres
+-#spring.liquibase.user=postgres
+-#spring.liquibase.password=admin
+-#spring.liquibase.default-schema=public
++
++spring.liquibase.change-log=classpath:db/changelog/db.changelog-master.xml
++spring.liquibase.enabled=true
++spring.liquibase.url=jdbc:postgresql://localhost:5432/postgres
++spring.liquibase.user=postgres
++spring.liquibase.password=admin
++spring.liquibase.default-schema=public
++spring.liquibase.liquibase-schema=public

@@ -2,16 +2,12 @@ package com.rest.quiz.restQuiz.controller.impl;
 
 import com.rest.quiz.restQuiz.dto.QuizDTO;
 import com.rest.quiz.restQuiz.dto.QuizQuestionDTO;
-import com.rest.quiz.restQuiz.model.Quiz;
-import com.rest.quiz.restQuiz.model.QuizQuestion;
-import com.rest.quiz.restQuiz.repository.QuizRepository;
 import com.rest.quiz.restQuiz.service.QuizService;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
@@ -20,9 +16,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 import java.util.Objects;
 
 import static com.google.common.net.HttpHeaders.ACCEPT;
@@ -65,7 +58,7 @@ class QuizControllerImplTest {
 
     @Test
     void updateByIdShouldSuccess() {
-        QuizDTO quizDTO = new QuizDTO();
+        QuizDTO quizDTO = getQuizDTO();
         quizDTO.setQuizName("Поменял вопрос");
         System.out.println(this.webTestClient
                 .put()
@@ -81,35 +74,9 @@ class QuizControllerImplTest {
                 .jsonPath("$.quizName").isEqualTo("Поменял вопрос").returnResult());
     }
 
-    @Test
-    void  deleteByIdShouldSuccess() {
-        //Long lastId = quizService.findLastId();
-
-        webTestClient
-                .delete()
-                .uri(String.format(Objects.requireNonNull(environment.getProperty("deleteQuiz")), 1))
-                .accept(APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isOk();
-
-
-
-//        System.out.println(this.webTestClient
-//                .get()
-//                .uri(String.format(Objects.requireNonNull(environment.getProperty("getQuizStateById")), 1))
-//                .header(ACCEPT, APPLICATION_JSON_VALUE)
-//                .exchange()
-//                .expectStatus()
-//                .is2xxSuccessful()
-//                .expectHeader()
-//                .contentType(APPLICATION_JSON)
-//                .expectBody()
-//                .jsonPath("$.state").isEqualTo("DELETED").returnResult());
-
-    }
 
     @Test
-    void createShouldSuccess() {
+    void createAndDeleteShouldSuccess() {
         QuizDTO quizDTO = getQuizDTO();
         Long lastId = quizService.findLastId();
         System.out.println(webTestClient.post().uri(Objects.requireNonNull(environment.getProperty("createQuiz")))
@@ -138,13 +105,54 @@ class QuizControllerImplTest {
                 .accept(MediaType.APPLICATION_JSON_UTF8)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBodyList(QuizDTO.class).hasSize(2).returnResult()) ;
+                .expectBodyList(QuizDTO.class).hasSize(1).returnResult()) ;
+    }
+
+
+
+    @Test
+    void getByIdQuizQuestionShouldSuccess() {
+        System.out.println(this.webTestClient
+                .get()
+                .uri(String.format(Objects.requireNonNull(environment.getProperty("getQuizQuestionById")), 1))
+                .header(ACCEPT, APPLICATION_JSON_VALUE)
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectHeader()
+                .contentType(APPLICATION_JSON)
+                .expectBody()
+                .jsonPath("$.question").isNotEmpty().returnResult());
+    }
+
+    @Test
+    void updateQuizQuestionByIdShouldSuccess() {
+        QuizQuestionDTO quizQuestionDTO = getQuizQuestionDTO();
+        quizQuestionDTO.setQuestion("Поменял вопрос");
+        System.out.println(this.webTestClient
+                .put()
+                .uri(String.format(Objects.requireNonNull(environment.getProperty("updateQuiz")), 1))
+                .contentType(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .header(ACCEPT, APPLICATION_JSON_VALUE)
+                .body(Mono.just(quizQuestionDTO), QuizDTO.class)
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.question").isEqualTo("Поменял вопрос").returnResult());
+    }
+
+    private QuizQuestionDTO getQuizQuestionDTO() {
+        QuizQuestionDTO quizQuestionDTO = quizService.getQuizQuestionById(1L);
+        quizQuestionDTO.setId(null);
+        return quizQuestionDTO;
     }
 
     private QuizDTO getQuizDTO() {
         QuizDTO quizDTO = quizService.getQuizById(1L);
         quizDTO.setId(null);
-        for(QuizQuestionDTO quizQuestionDto:quizDTO.getQuizQuestionList()){
+        for(QuizQuestionDTO quizQuestionDto :quizDTO.getQuizQuestionList()){
             quizQuestionDto.setId(null);
         }
         return quizDTO;

@@ -3,54 +3,49 @@ package com.rest.quiz.restQuiz.service.mapper;
 import com.rest.quiz.restQuiz.dto.QuizDTO;
 import com.rest.quiz.restQuiz.dto.QuizQuestionDTO;
 import com.rest.quiz.restQuiz.model.Quiz;
+
 import com.rest.quiz.restQuiz.model.QuizQuestion;
-import org.dozer.DozerBeanMapper;
-import org.dozer.Mapper;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
+import java.util.Objects;
+
 
 @Service
 public class MapModel {
 
-    private Mapper dozerMapper = new DozerBeanMapper();
+    private final ModelMapper modelMapper;
 
-    private final DozerBeanMapper dozerBeanMapper;
 
-    public MapModel(DozerBeanMapper dozerBeanMapper) {
-        this.dozerBeanMapper = dozerBeanMapper;
+    public MapModel(ModelMapper modelMapper) {
+        this.modelMapper = modelMapper;
     }
 
     public QuizDTO convertToDto(Quiz quiz) {
-        return dozerMapper.map(quiz, QuizDTO.class);
+        return modelMapper.map(quiz, QuizDTO.class);
     }
     public QuizQuestionDTO convertToDto(QuizQuestion quizQuestion) {
-        return dozerMapper.map(quizQuestion, QuizQuestionDTO.class);
+        return modelMapper.map(quizQuestion, QuizQuestionDTO.class);
     }
 
     public Quiz convertToEntity(QuizDTO quizDTO) {
-        Quiz quiz = dozerMapper.map(quizDTO, Quiz.class);
-        if(!quiz.getQuizQuestionList().isEmpty()) {
+        Quiz quiz = modelMapper.map(quizDTO, Quiz.class);
+        if(Objects.nonNull(quiz) && Objects.nonNull(quiz.getQuizQuestionList()) && !quiz.getQuizQuestionList().isEmpty()) {
             quiz.getQuizQuestionList().forEach(x -> x.setQuiz(quiz));
         }
         return quiz;
     }
 
     public QuizQuestion convertToEntity(QuizQuestionDTO quizQuestionDTO) {
-        QuizQuestion quizQuestion = dozerMapper.map(quizQuestionDTO, QuizQuestion.class);
-        return quizQuestion;
+        return modelMapper.map(quizQuestionDTO, QuizQuestion.class);
     }
 
-    public void mapForUpdate(QuizQuestionDTO quizDTO, QuizQuestion quiz) {
-        dozerMapper.map(quizDTO, quiz);
+    public void mapForUpdate(QuizQuestion quizForUpdate, QuizQuestion quiz) {
+        modelMapper.map(quizForUpdate, quiz);
     }
 
-    public void mapForUpdate(QuizDTO quizDTO, Quiz quiz) {
-        dozerBeanMapper.map(quizDTO,quiz);
+    public void mapForUpdate(Quiz quizDto, Quiz quiz) {
+        modelMapper.map(quizDto,quiz);
     }
 
-    public Mapper getDozerMapper() {
-        return dozerMapper;
-    }
 }

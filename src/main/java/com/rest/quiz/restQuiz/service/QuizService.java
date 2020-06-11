@@ -10,16 +10,10 @@ import com.rest.quiz.restQuiz.repository.QuizQuestionRepository;
 import com.rest.quiz.restQuiz.repository.QuizRepository;
 import com.rest.quiz.restQuiz.service.mapper.MapModel;
 import lombok.AllArgsConstructor;
-import org.dozer.DozerBeanMapper;
 import org.springframework.stereotype.Service;
 
-import javax.sql.DataSource;
 import javax.transaction.Transactional;
-import java.math.BigInteger;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -30,7 +24,6 @@ public class QuizService {
     private final QuizRepository quizRepository;
     private final QuizQuestionRepository quizQuestionRepository;
     private final MapModel mapModel;
-    private final DozerBeanMapper dozerBeanMapper;
     @Transactional
     public QuizDTO getQuizById(Long quizId) {
         Quiz quiz = quizRepository.findById(quizId).orElseThrow(() -> new QuizNotFoundException("Quiz not Found with " + quizId + " id."));
@@ -79,9 +72,20 @@ public class QuizService {
         Quiz quizUpdate = quizRepository.findById(quizId).orElseThrow(() -> new QuizNotFoundException(
                 "Quiz not Found with " + quizId + " id.")
         );
-
-        dozerBeanMapper.map(quizDTO, quizUpdate);
+        Quiz quizForUpdate = mapModel.convertToEntity(quizDTO);
+        mapModel.mapForUpdate(quizForUpdate,quizUpdate);
         return mapModel.convertToDto(quizRepository.save(quizUpdate));
+    }
+
+    @Transactional
+        public QuizQuestionDTO updateQuizQuestion(QuizQuestionDTO quizQuestionDTO, long quizId) {
+        quizQuestionDTO.setId(quizId);
+        QuizQuestion quizUpdate = quizQuestionRepository.findById(quizId).orElseThrow(() -> new QuizNotFoundException(
+                "QuizQuestion not Found with " + quizId + " id.")
+        );
+        QuizQuestion quizForUpdate = mapModel.convertToEntity(quizQuestionDTO);
+        mapModel.mapForUpdate(quizForUpdate,quizUpdate);
+        return mapModel.convertToDto(quizQuestionRepository.save(quizUpdate));
     }
 
     public void deleteQuiz(long quizId) {
